@@ -1,2 +1,2 @@
-# Notepad
-Customizable Notepad
+# Code.Notepad
+Customizable Code.Notepad
