@@ -1,18 +1,13 @@
-package Code;
+ package Code;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
-import java.util.Locale;
+import java.io.*;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
-//import javax.swing.filechooser.*;
+import javax.swing.filechooser.*;
 
 public class Notepad implements ActionListener, ComponentListener{
     private JFrame frame;  //Container for everything
@@ -26,7 +21,7 @@ public class Notepad implements ActionListener, ComponentListener{
     private JMenuItem blue, yellow, green, pink, red, white, black, gray;  //Settings Menu Colors
     private JTextArea textArea;
     //Undo Manager
-    private UndoManager manager = new UndoManager();
+    private UndoManager manager;
 
     private final Color PASTEL_BLUE = new Color(209, 237, 255, 255);
     private final Color PASTEL_YELLOW = new Color(255, 254, 176, 255);
@@ -72,6 +67,10 @@ public class Notepad implements ActionListener, ComponentListener{
         white = new JMenuItem("White");
         black = new JMenuItem("Black");
         gray = new JMenuItem("Gray");
+
+        //Undo Manager
+        manager = new UndoManager();
+
         //JTextArea and JScrollPane
         textArea = new JTextArea();
         textArea.setLineWrap(true);
@@ -96,7 +95,7 @@ public class Notepad implements ActionListener, ComponentListener{
      */
     public void run(){
 
-        //File menu items and action listeners 
+        //File menu items and action listeners
         fileMenu.add(saveFile);
         fileMenu.add(openFile);
         fileMenu.add(exit);
@@ -143,6 +142,7 @@ public class Notepad implements ActionListener, ComponentListener{
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
         menuBar.add(settingsMenu);
+        menuBar.setBackground(Color.WHITE);
 
         //Adding menu and JScrollPane to the frame
         frame.add(menuBar, BorderLayout.NORTH);
@@ -162,14 +162,45 @@ public class Notepad implements ActionListener, ComponentListener{
 
         //File menu options
         if(e.getSource() == openFile){
-            try {
-                Runtime.getRuntime().exec("explorer.exe /select," + "Desktop");
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            JFileChooser opener = new JFileChooser();
+            //Prevents all file types to be accepted
+            opener.setAcceptAllFileFilterUsed(false);
+            //Filter to only accept .txt files
+            FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("Only .txt files", "txt");
+            opener.addChoosableFileFilter(txtFilter);
+
+            int result = opener.showOpenDialog(null);
+            if(result == JFileChooser.APPROVE_OPTION){
+                File openFile = opener.getSelectedFile();
+                try{
+                    //Reading the file
+                    FileReader fr = new FileReader(openFile);
+                    BufferedReader br = new BufferedReader(fr);
+                    textArea.read(br, null);
+                    //Closing the file after reading is done and clearing memory
+                    br.close();
+                    textArea.requestFocus();
+                }catch(Exception ex){
+                    System.out.print(ex);
+                }
             }
         }
         else if(e.getSource() == saveFile){
-            System.out.println(textArea.getText());
+            JFileChooser saveAs = new JFileChooser();
+            //Sets up the file chooser
+            saveAs.setApproveButtonText("Save");
+            int save = saveAs.showOpenDialog(frame);
+            if(save != JFileChooser.APPROVE_OPTION){
+                return;
+            }
+            File saveFile = new File(saveAs.getSelectedFile() + ".txt");
+            BufferedWriter output = null;
+            try{
+                output = new BufferedWriter(new FileWriter(saveFile));
+                textArea.write(output);
+            }catch(IOException except){
+                except.printStackTrace();
+            }
         }
         if(e.getSource() == exit){
             manager.discardAllEdits();
