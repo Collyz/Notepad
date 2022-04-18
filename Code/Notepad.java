@@ -121,7 +121,7 @@ public class Notepad implements ActionListener, ComponentListener{
         redo.addActionListener(this);
         //Settings menu items and action listeners
         settingsMenu.add(changeColorMenu); //Adds submenu  - Change Color to settings menu
-        settingsMenu.add(changeCursor); //Adds submenu - Change Cursor to settings menu
+        //settingsMenu.add(changeCursor); //Adds submenu - Change Cursor to settings menu
         changeColorMenu.add(blue);
         changeColorMenu.add(yellow);
         changeColorMenu.add(green);
