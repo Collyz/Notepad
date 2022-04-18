@@ -1,5 +1,5 @@
 # Notepad
-A customizable notepad build using java.
+A customizable notepad built using java.
 
 A working .jar file currently exists in the /Code folder
  - Customizations Current:
